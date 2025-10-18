@@ -42,7 +42,9 @@ let package = Package(
                 "AIManager.swift",
                 "CompanionOrchestrator.swift",
                 "MemorySystems.swift",
-                "CompanionTools.swift"
+                "CompanionTools.swift",
+                "VoiceManager.swift",
+                "PersonalityEngine.swift"
             ]
         )
     ]

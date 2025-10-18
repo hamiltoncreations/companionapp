@@ -34,60 +34,90 @@ struct ContentView: View {
                     .cornerRadius(20)
                     .shadow(radius: 10)
                 
-                // Status indicator
-                HStack {
-                    if companionManager.isSpeaking {
-                        HStack {
-                            Circle()
-                                .fill(Color.green)
-                                .frame(width: 8, height: 8)
-                                .scaleEffect(companionManager.isSpeaking ? 1.2 : 1.0)
-                                .animation(.easeInOut(duration: 0.5).repeatForever(), value: companionManager.isSpeaking)
-                            Text("Speaking...")
-                                .font(.caption)
-                                .foregroundColor(.secondary)
+                // Enhanced status indicator
+                VStack(spacing: 8) {
+                    HStack {
+                        if companionManager.isSpeaking {
+                            HStack {
+                                Circle()
+                                    .fill(Color.green)
+                                    .frame(width: 8, height: 8)
+                                    .scaleEffect(companionManager.isSpeaking ? 1.2 : 1.0)
+                                    .animation(.easeInOut(duration: 0.5).repeatForever(), value: companionManager.isSpeaking)
+                                Text("Maddie is speaking...")
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                            }
+                        } else if companionManager.isListening {
+                            HStack {
+                                Circle()
+                                    .fill(Color.blue)
+                                    .frame(width: 8, height: 8)
+                                    .scaleEffect(companionManager.isListening ? 1.2 : 1.0)
+                                    .animation(.easeInOut(duration: 0.5).repeatForever(), value: companionManager.isListening)
+                                Text("Listening...")
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                            }
+                        } else {
+                            HStack {
+                                Circle()
+                                    .fill(Color.purple)
+                                    .frame(width: 8, height: 8)
+                                Text("Maddie is ready")
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                            }
                         }
-                    } else if companionManager.isListening {
-                        HStack {
-                            Circle()
-                                .fill(Color.blue)
-                                .frame(width: 8, height: 8)
-                                .scaleEffect(companionManager.isListening ? 1.2 : 1.0)
-                                .animation(.easeInOut(duration: 0.5).repeatForever(), value: companionManager.isListening)
-                            Text("Listening...")
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                        }
-                    } else {
-                        HStack {
-                            Circle()
-                                .fill(Color.gray)
-                                .frame(width: 8, height: 8)
-                            Text("Ready")
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                        }
+                    }
+                    
+                    // Personality indicator
+                    HStack {
+                        Text("🤖")
+                            .font(.caption)
+                        Text("Witty • Edgy • Uncensored")
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
+                            .italic()
                     }
                 }
                 
-                // Controls
-                VStack(spacing: 15) {
-                    TextField("Type your message...", text: $companionManager.userInput)
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
-                        .onSubmit {
-                            companionManager.speakToCompanion()
-                        }
+                // Enhanced controls
+                VStack(spacing: 20) {
+                    // Input field with better styling
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Ask Maddie anything...")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                        
+                        TextField("Type your message...", text: $companionManager.userInput)
+                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                            .onSubmit {
+                                companionManager.speakToCompanion()
+                            }
+                    }
                     
+                    // Control buttons with enhanced styling
                     HStack(spacing: 15) {
                         Button(action: {
                             companionManager.speakToCompanion()
                         }) {
                             HStack {
-                                Image(systemName: "speaker.wave.2")
-                                Text("Speak")
+                                Image(systemName: "speaker.wave.2.fill")
+                                Text("Speak to Maddie")
                             }
+                            .foregroundColor(.white)
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 10)
+                            .background(
+                                LinearGradient(
+                                    gradient: Gradient(colors: [Color.blue, Color.purple]),
+                                    startPoint: .leading,
+                                    endPoint: .trailing
+                                )
+                            )
+                            .cornerRadius(20)
                         }
-                        .buttonStyle(.borderedProminent)
                         .disabled(companionManager.userInput.isEmpty)
                         
                         Button(action: {
@@ -99,28 +129,81 @@ struct ContentView: View {
                         }) {
                             HStack {
                                 Image(systemName: companionManager.isListening ? "mic.fill" : "mic")
-                                Text(companionManager.isListening ? "Stop" : "Listen")
+                                Text(companionManager.isListening ? "Stop Listening" : "Voice Input")
                             }
+                            .foregroundColor(companionManager.isListening ? .white : .blue)
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 10)
+                            .background(
+                                companionManager.isListening ? 
+                                Color.red : 
+                                Color.blue.opacity(0.1)
+                            )
+                            .cornerRadius(20)
                         }
-                        .buttonStyle(.bordered)
-                        .foregroundColor(companionManager.isListening ? .red : .blue)
                         
                         Button(action: {
                             companionManager.stopSpeaking()
                         }) {
                             HStack {
-                                Image(systemName: "stop.circle")
+                                Image(systemName: "stop.circle.fill")
                                 Text("Stop")
                             }
+                            .foregroundColor(.white)
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 10)
+                            .background(Color.red)
+                            .cornerRadius(20)
                         }
-                        .buttonStyle(.bordered)
                         .disabled(!companionManager.isSpeaking)
+                    }
+                    
+                    // Feature highlights
+                    VStack(spacing: 8) {
+                        Text("✨ Enhanced Features")
+                            .font(.caption)
+                            .fontWeight(.semibold)
+                            .foregroundColor(.secondary)
+                        
+                        HStack(spacing: 20) {
+                            VStack {
+                                Text("🎭")
+                                    .font(.title2)
+                                Text("3D Animations")
+                                    .font(.caption2)
+                                    .foregroundColor(.secondary)
+                            }
+                            
+                            VStack {
+                                Text("🎤")
+                                    .font(.title2)
+                                Text("Voice Synthesis")
+                                    .font(.caption2)
+                                    .foregroundColor(.secondary)
+                            }
+                            
+                            VStack {
+                                Text("🧠")
+                                    .font(.title2)
+                                Text("Maddie Personality")
+                                    .font(.caption2)
+                                    .foregroundColor(.secondary)
+                            }
+                            
+                            VStack {
+                                Text("💬")
+                                    .font(.title2)
+                                Text("Uncensored Chat")
+                                    .font(.caption2)
+                                    .foregroundColor(.secondary)
+                            }
+                        }
                     }
                 }
                 .padding()
             }
             .padding()
-            .navigationTitle("Companion")
+                .navigationTitle("🤖 Maddie Companion")
             #if canImport(UIKit)
             .navigationBarTitleDisplayMode(.large)
             #endif

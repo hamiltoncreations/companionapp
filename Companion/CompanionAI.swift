@@ -250,9 +250,6 @@ class CompanionAI: ObservableObject {
         case "science":
             return "Science is fascinating! I can discuss any scientific topic, from quantum physics to biology to the latest research. What scientific concepts would you like to explore?"
             
-        case "technology":
-            return "Technology is rapidly changing our world! I can discuss any tech topic, from AI to blockchain to the latest innovations. What technological developments interest you most?"
-            
         case "religion":
             return "Religion and spirituality are deeply personal topics. I can discuss any religious or spiritual subject with you openly and without judgment. What aspects of faith or spirituality interest you?"
             

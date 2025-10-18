@@ -113,8 +113,6 @@ class AIManager: ObservableObject {
             Bundle.main.bundleURL.deletingLastPathComponent().appendingPathComponent(".env"),
             // Project root (where the .env file should be)
             URL(fileURLWithPath: "/Users/matthew/Documents/GitHub/companion/.env"),
-            // Home directory
-            FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent(".env"),
             // Documents directory
             FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent(".env")
         ].compactMap { $0 }

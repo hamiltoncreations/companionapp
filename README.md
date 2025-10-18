@@ -1,6 +1,6 @@
-# Companion App
+# Maddie Companion App
 
-A sophisticated 3D animated companion app with AI capabilities, built with SwiftUI, SceneKit, and OpenAI integration.
+A sophisticated 3D animated companion app with AI capabilities, built with SwiftUI, SceneKit, and OpenAI integration. Features a witty, edgy, and uncensored AI personality.
 
 ## Features
 

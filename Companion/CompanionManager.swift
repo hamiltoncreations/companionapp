@@ -18,11 +18,14 @@ class CompanionManager: NSObject, ObservableObject {
     let scene: SCNScene
     private var companionModel: Companion3DModel?
     private var orchestrator: CompanionOrchestrator
-    private var speechSynthesizer: AVSpeechSynthesizer
+    private var voiceManager: VoiceManager
     private var audioEngine: AVAudioEngine
     private var speechRecognizer: SFSpeechRecognizer
     private var recognitionRequest: SFSpeechAudioBufferRecognitionRequest?
     private var recognitionTask: SFSpeechRecognitionTask?
+    
+    // Lip-sync timer
+    private var lipSyncTimer: Timer?
     
     override init() {
         // Initialize 3D scene
@@ -31,7 +34,8 @@ class CompanionManager: NSObject, ObservableObject {
         // Initialize AI orchestrator with proper AI libraries
         self.orchestrator = CompanionOrchestrator()
         
-        self.speechSynthesizer = AVSpeechSynthesizer()
+        // Initialize enhanced voice manager
+        self.voiceManager = VoiceManager()
         self.audioEngine = AVAudioEngine()
         self.speechRecognizer = SFSpeechRecognizer(locale: Locale(identifier: "en-US"))!
         
@@ -91,7 +95,33 @@ class CompanionManager: NSObject, ObservableObject {
     }
     
     private func setupAudio() {
-        speechSynthesizer.delegate = self
+        // Voice manager handles its own delegate setup
+        // Setup lip-sync monitoring
+        setupLipSync()
+    }
+    
+    private func setupLipSync() {
+        // Monitor voice manager for lip-sync updates
+        lipSyncTimer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { _ in
+            self.updateLipSync()
+        }
+    }
+    
+    private func updateLipSync() {
+        guard let companionModel = companionModel else { return }
+        
+        if voiceManager.isSpeaking {
+            let mouthOpenness = voiceManager.getMouthOpenness()
+            updateMouthShape(openness: mouthOpenness)
+        }
+    }
+    
+    private func updateMouthShape(openness: Float) {
+        guard let companionModel = companionModel else { return }
+        
+        // Scale mouth based on phoneme intensity
+        let scale = SCNVector3(1.0, 0.4 + (openness * 0.6), 0.2 + (openness * 0.3))
+        companionModel.mouthNode.scale = scale
     }
     
     private func requestPermissions() {
@@ -115,8 +145,15 @@ class CompanionManager: NSObject, ObservableObject {
         print("✅ userInput is not empty, proceeding with AI generation")
         let currentInput = userInput  // Capture the input before clearing it
         userInput = ""  // Clear it immediately
+        
+        // Start thinking animation
+        companionModel?.playThinkingAnimation()
+        
         Task {
             let response = await generateCompanionResponse(to: currentInput)
+            
+            // Stop thinking animation and start speaking
+            await companionModel?.stopThinking()
             speak(text: response)
         }
     }
@@ -143,20 +180,34 @@ class CompanionManager: NSObject, ObservableObject {
     }
     
     func speak(text: String) {
-        let utterance = AVSpeechUtterance(string: text)
-        utterance.voice = AVSpeechSynthesisVoice(language: "en-US")
-        
-        // Use settings from UserDefaults
-        utterance.rate = Float(UserDefaults.standard.double(forKey: "speechRate") != 0 ? UserDefaults.standard.double(forKey: "speechRate") : 0.5)
-        utterance.pitchMultiplier = Float(UserDefaults.standard.double(forKey: "speechPitch") != 0 ? UserDefaults.standard.double(forKey: "speechPitch") : 1.0)
+        // Use enhanced voice manager with emotion detection
+        let emotion = detectEmotionFromText(text)
+        voiceManager.speak(text: text, with: emotion)
         
         DispatchQueue.main.async {
             self.isSpeaking = true
         }
-        speechSynthesizer.speak(utterance)
         
         // Add speaking animation to 3D model
         animateSpeaking()
+    }
+    
+    private func detectEmotionFromText(_ text: String) -> VoiceManager.VoiceEmotion {
+        let lowercaseText = text.lowercased()
+        
+        if lowercaseText.contains("!") || lowercaseText.contains("amazing") || lowercaseText.contains("awesome") {
+            return .excited
+        } else if lowercaseText.contains("sorry") || lowercaseText.contains("sad") || lowercaseText.contains("unfortunately") {
+            return .sad
+        } else if lowercaseText.contains("really") || lowercaseText.contains("actually") || lowercaseText.contains("hmm") {
+            return .sarcastic
+        } else if lowercaseText.contains("but") || lowercaseText.contains("however") || lowercaseText.contains("interesting") {
+            return .witty
+        } else if lowercaseText.contains("...") || lowercaseText.contains("let me think") || lowercaseText.contains("well") {
+            return .thinking
+        } else {
+            return .neutral
+        }
     }
     
     private func animateSpeaking() {
@@ -173,7 +224,7 @@ class CompanionManager: NSObject, ObservableObject {
     }
     
     func stopSpeaking() {
-        speechSynthesizer.stopSpeaking(at: .immediate)
+        voiceManager.stopSpeaking()
         DispatchQueue.main.async {
             self.isSpeaking = false
         }
@@ -232,12 +283,15 @@ class CompanionManager: NSObject, ObservableObject {
     }
 }
 
-extension CompanionManager: AVSpeechSynthesizerDelegate {
-    func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didFinish utterance: AVSpeechUtterance) {
+extension CompanionManager {
+    // Monitor voice manager state changes
+    func updateSpeakingState() {
         DispatchQueue.main.async {
-            self.isSpeaking = false
-            self.companionModel?.stopSpeaking()
-            self.companionModel?.removeAction(forKey: "headBob")
+            self.isSpeaking = self.voiceManager.isSpeaking
+            if !self.isSpeaking {
+                self.companionModel?.stopSpeaking()
+                self.companionModel?.removeAction(forKey: "headBob")
+            }
         }
     }
 }

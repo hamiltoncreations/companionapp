@@ -24,7 +24,7 @@ class CalendarTool: Tool {
         case .authorized:
             return await handleCalendarRequest(input)
         case .notDetermined:
-            if #available(macOS 14.0, *) {
+            if #available(iOS 17.0, *) {
                 let granted = try? await eventStore.requestFullAccessToEvents()
                 if granted == true {
                     return await handleCalendarRequest(input)
@@ -32,10 +32,20 @@ class CalendarTool: Tool {
                     return "I need calendar access to help with events."
                 }
             } else {
-                return "Calendar access requires macOS 14.0 or later for full functionality."
+                // For iOS 15-16, use the older API
+                let granted = try? await eventStore.requestAccess(to: .event)
+                if granted == true {
+                    return await handleCalendarRequest(input)
+                } else {
+                    return "I need calendar access to help with events."
+                }
             }
         case .denied, .restricted:
             return "I don't have access to your calendar. Please enable it in Settings."
+        case .fullAccess:
+            return await handleCalendarRequest(input)
+        case .writeOnly:
+            return "Calendar access is limited. I can't read your events with write-only access."
         @unknown default:
             return "I'm having trouble accessing your calendar."
         }
@@ -64,7 +74,7 @@ class CalendarTool: Tool {
         if events.isEmpty {
             return "You have no events scheduled for today."
         } else {
-            let eventList = events.map { "• \($0.title) at \($0.startDate)" }.joined(separator: "\n")
+            let eventList = events.map { "• \($0.title ?? "Untitled Event") at \($0.startDate)" }.joined(separator: "\n")
             return "Today's events:\n\(eventList)"
         }
     }

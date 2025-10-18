@@ -15,6 +15,8 @@
 		347ED5702EA404B600CD7172 /* MemorySystems.swift in Sources */ = {isa = PBXBuildFile; fileRef = 347ED5652EA404B600CD7172 /* MemorySystems.swift */; };
 		347ED5DB2EA41B2F00CD7172 /* OpenAIProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 347ED5DC2EA41B2F00CD7172 /* OpenAIProvider.swift */; };
 		347ED5DD2EA41B2F00CD7172 /* RuleBasedAIProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 347ED5DE2EA41B2F00CD7172 /* RuleBasedAIProvider.swift */; };
+		34BD92532EA44009004FB72A /* VoiceManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34BD92522EA44009004FB72A /* VoiceManager.swift */; };
+		34BD92542EA44009004FB72A /* PersonalityEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34BD92512EA44009004FB72A /* PersonalityEngine.swift */; };
 		A1234567890ABCDEF001 /* CompanionApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890ABCDEF002 /* CompanionApp.swift */; };
 		A1234567890ABCDEF003 /* CompanionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890ABCDEF004 /* CompanionManager.swift */; };
 		A1234567890ABCDEF005 /* Companion3DModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890ABCDEF006 /* Companion3DModel.swift */; };
@@ -31,6 +33,8 @@
 		347ED5652EA404B600CD7172 /* MemorySystems.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemorySystems.swift; sourceTree = "<group>"; };
 		347ED5DC2EA41B2F00CD7172 /* OpenAIProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenAIProvider.swift; sourceTree = "<group>"; };
 		347ED5DE2EA41B2F00CD7172 /* RuleBasedAIProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuleBasedAIProvider.swift; sourceTree = "<group>"; };
+		34BD92512EA44009004FB72A /* PersonalityEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersonalityEngine.swift; sourceTree = "<group>"; };
+		34BD92522EA44009004FB72A /* VoiceManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceManager.swift; sourceTree = "<group>"; };
 		A1234567890ABCDEF002 /* CompanionApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompanionApp.swift; sourceTree = "<group>"; };
 		A1234567890ABCDEF004 /* CompanionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompanionManager.swift; sourceTree = "<group>"; };
 		A1234567890ABCDEF006 /* Companion3DModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Companion3DModel.swift; sourceTree = "<group>"; };
@@ -62,6 +66,8 @@
 		A1234567890ABCDEF016 /* Companion */ = {
 			isa = PBXGroup;
 			children = (
+				34BD92512EA44009004FB72A /* PersonalityEngine.swift */,
+				34BD92522EA44009004FB72A /* VoiceManager.swift */,
 				347ED5DC2EA41B2F00CD7172 /* OpenAIProvider.swift */,
 				347ED5DE2EA41B2F00CD7172 /* RuleBasedAIProvider.swift */,
 				347ED55F2EA404B600CD7172 /* AIManager.swift */,
@@ -163,6 +169,8 @@
 				347ED5682EA404B600CD7172 /* CompanionTools.swift in Sources */,
 				347ED56A2EA404B600CD7172 /* AIManager.swift in Sources */,
 				347ED56B2EA404B600CD7172 /* CompanionOrchestrator.swift in Sources */,
+				34BD92532EA44009004FB72A /* VoiceManager.swift in Sources */,
+				34BD92542EA44009004FB72A /* PersonalityEngine.swift in Sources */,
 				347ED5DB2EA41B2F00CD7172 /* OpenAIProvider.swift in Sources */,
 				347ED5DD2EA41B2F00CD7172 /* RuleBasedAIProvider.swift in Sources */,
 				347ED56D2EA404B600CD7172 /* AIProvider.swift in Sources */,

@@ -12,6 +12,8 @@
     <string>com.yourcompany.companion</string>
     <key>CFBundleName</key>
     <string>Companion</string>
+    <key>CFBundleExecutable</key>
+    <string>Companion</string>
     <key>CFBundleShortVersionString</key>
     <string>1.0</string>
     <key>CFBundleVersion</key>

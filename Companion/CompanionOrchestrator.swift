@@ -62,6 +62,7 @@ class CompanionOrchestrator: ObservableObject {
     private var aiManager: AIManager
     private var memoryManager: MemoryManager
     private var toolManager: ToolManager
+    private var personalityEngine: PersonalityEngine
     
     // Memory systems
     private var shortTermMemory: ShortTermMemory
@@ -73,6 +74,7 @@ class CompanionOrchestrator: ObservableObject {
         self.aiManager = AIManager()
         self.memoryManager = MemoryManager()
         self.toolManager = ToolManager()
+        self.personalityEngine = PersonalityEngine()
         
         self.shortTermMemory = ShortTermMemory()
         self.longTermMemory = LongTermMemory()
@@ -112,13 +114,13 @@ class CompanionOrchestrator: ObservableObject {
         await shortTermMemory.addMessage(input)
         
         // 2. Retrieve relevant context from long-term memory
-        let longTermContext = await longTermMemory.retrieveContext(for: input)
+        let _ = await longTermMemory.retrieveContext(for: input)
         
         // 3. Get current emotional state
         let emotionalState = await emotionalMemory.getCurrentEmotionalState()
         
-        // 4. Use just the user input for now (simplified)
-        let fullContext = input
+        // 4. Use personality engine to enhance the input
+        let personalityResponse = personalityEngine.generatePersonalityResponse(to: input)
         
         // 5. Decide if a tool is needed (simplified for now)
         if let toolResponse = await toolManager.decideAndExecuteTool(for: input) {
@@ -127,18 +129,21 @@ class CompanionOrchestrator: ObservableObject {
             return toolResponse
         }
         
-        // 6. Generate response using the selected AI provider
-        let aiResponse = await aiManager.generateResponse(to: fullContext)
+        // 6. Generate response using the selected AI provider with personality
+        let aiResponse = await aiManager.generateResponse(to: personalityResponse)
         
         // Update current AI provider for debugging
         currentAIProvider = aiManager.currentProvider.name
         
-        // 7. Update memory systems with the AI's response
-        await shortTermMemory.addMessage(aiResponse)
-        await updateMemories(input: input, response: aiResponse, emotionalState: emotionalState)
+        // 7. Apply personality enhancements to the AI response
+        let enhancedResponse = personalityEngine.generatePersonalityResponse(to: aiResponse)
         
-        print("✅ Orchestrator generated response: '\(aiResponse)'")
-        return aiResponse
+        // 8. Update memory systems with the enhanced response
+        await shortTermMemory.addMessage(enhancedResponse)
+        await updateMemories(input: input, response: enhancedResponse, emotionalState: emotionalState)
+        
+        print("✅ Orchestrator generated response: '\(enhancedResponse)'")
+        return enhancedResponse
     }
     
     private func setupMemorySystems() {
