@@ -90,18 +90,69 @@ class AIManager: ObservableObject {
         return availableProviders.compactMap { $0 as? CloudAIProvider }
     }
     
-    /// Securely retrieve OpenAI API key from environment or Info.plist
+    /// Securely retrieve OpenAI API key from environment, .env file, or Info.plist
     private func getOpenAIKey() -> String? {
+        print("🔍 Searching for OpenAI API key...")
+        
         // First try environment variable
         if let envKey = ProcessInfo.processInfo.environment["OPENAI_API_KEY"], !envKey.isEmpty {
+            print("✅ Found API key in environment variable")
             return envKey
         }
         
-        // Then try Info.plist
+        // Then try .env file
+        if let envKey = loadFromEnvFile() {
+            return envKey
+        }
+        
+        // Finally try Info.plist
         if let plistKey = Bundle.main.object(forInfoDictionaryKey: "OPENAI_API_KEY") as? String, !plistKey.isEmpty {
+            print("✅ Found API key in Info.plist")
             return plistKey
         }
         
+        print("❌ No API key found in any location")
+        return nil
+    }
+    
+    /// Load API key from .env file
+    private func loadFromEnvFile() -> String? {
+        // Try multiple possible locations for .env file
+        let possiblePaths = [
+            // Current working directory
+            URL(fileURLWithPath: FileManager.default.currentDirectoryPath).appendingPathComponent(".env"),
+            // Bundle resource path
+            Bundle.main.bundleURL.deletingLastPathComponent().appendingPathComponent(".env"),
+            // Project root (where the .env file should be)
+            URL(fileURLWithPath: "/Users/matthew/Documents/GitHub/companion/.env"),
+            // Home directory
+            FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent(".env"),
+            // Documents directory
+            FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent(".env")
+        ].compactMap { $0 }
+        
+        for envFileURL in possiblePaths {
+            do {
+                let content = try String(contentsOf: envFileURL)
+                let lines = content.components(separatedBy: .newlines)
+                
+                for line in lines {
+                    let trimmedLine = line.trimmingCharacters(in: .whitespacesAndNewlines)
+                    if trimmedLine.hasPrefix("OPENAI_API_KEY=") {
+                        let key = String(trimmedLine.dropFirst("OPENAI_API_KEY=".count))
+                        if !key.isEmpty && key != "your-openai-api-key-here" {
+                            print("✅ Found API key in .env file at: \(envFileURL.path)")
+                            return key
+                        }
+                    }
+                }
+            } catch {
+                // Continue to next path
+                continue
+            }
+        }
+        
+        print("⚠️ .env file not found in any expected location")
         return nil
     }
 }
