@@ -34,15 +34,15 @@ A sophisticated 3D animated companion app with AI capabilities, built with Swift
 
 ### AI Setup
 
-#### Option 1: OpenAI/ChatGPT (Recommended - Simple & Reliable)
-The app automatically detects your OpenAI API key from environment variables or configuration.
+#### OpenAI/ChatGPT (Recommended - Simple & Reliable)
+The app automatically detects your OpenAI API key from a secure `.env` file.
 
 **To get your OpenAI API key:**
 1. Go to https://platform.openai.com/api-keys
 2. Create a new API key
 3. Follow the secure setup guide in `API_KEY_SETUP.md`
 
-**⚠️ Security Note**: Never commit API keys to version control! Use environment variables or secure configuration methods.
+**🔒 Security**: The app uses `.env` files for secure API key storage. Never commit API keys to version control!
 
 ### AI Recommendations
 - **Development/Testing**: OpenAI GPT-3.5-turbo (fast, cheap)

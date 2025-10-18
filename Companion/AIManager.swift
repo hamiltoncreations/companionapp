@@ -90,28 +90,16 @@ class AIManager: ObservableObject {
         return availableProviders.compactMap { $0 as? CloudAIProvider }
     }
     
-    /// Securely retrieve OpenAI API key from environment, .env file, or Info.plist
+    /// Securely retrieve OpenAI API key from .env file only
     private func getOpenAIKey() -> String? {
-        print("🔍 Searching for OpenAI API key...")
+        print("🔍 Searching for OpenAI API key in .env file...")
         
-        // First try environment variable
-        if let envKey = ProcessInfo.processInfo.environment["OPENAI_API_KEY"], !envKey.isEmpty {
-            print("✅ Found API key in environment variable")
-            return envKey
-        }
-        
-        // Then try .env file
+        // Only use .env file for security
         if let envKey = loadFromEnvFile() {
             return envKey
         }
         
-        // Finally try Info.plist
-        if let plistKey = Bundle.main.object(forInfoDictionaryKey: "OPENAI_API_KEY") as? String, !plistKey.isEmpty {
-            print("✅ Found API key in Info.plist")
-            return plistKey
-        }
-        
-        print("❌ No API key found in any location")
+        print("❌ No API key found in .env file")
         return nil
     }
     
