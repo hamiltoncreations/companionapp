@@ -74,6 +74,53 @@ class PersonalityEngine: ObservableObject {
         return enhancedResponse
     }
     
+    // NEW: Method to enhance existing AI responses instead of generating new ones
+    func enhanceAIResponse(_ aiResponse: String, for input: String) -> String {
+        // Analyze the input to understand context
+        let analysis = analyzeInput(input)
+        updateMoodBasedOnInput(analysis)
+        
+        // Apply light personality enhancements to the AI response
+        let enhancedResponse = applyLightPersonalityEnhancements(aiResponse, analysis: analysis)
+        
+        // Store conversation entry
+        storeConversationEntry(user: input, companion: enhancedResponse, analysis: analysis)
+        
+        return enhancedResponse
+    }
+    
+    private func applyLightPersonalityEnhancements(_ response: String, analysis: InputAnalysis) -> String {
+        // Light personality enhancements that preserve the original content
+        var enhanced = response
+        
+        // Add occasional personality touches without overwhelming the content
+        if analysis.humorPotential > 0.7 && Double.random(in: 0...1) < 0.3 {
+            let personalityTouches = [
+                " *adjusts virtual glasses* ",
+                " *gets excited about the topic* ",
+                " *cracks a digital smile* ",
+                " *nods enthusiastically* "
+            ]
+            if let touch = personalityTouches.randomElement() {
+                enhanced = touch + enhanced
+            }
+        }
+        
+        // Add occasional witty endings for certain response types
+        if analysis.questionType == .philosophical && Double.random(in: 0...1) < 0.2 {
+            let wittyEndings = [
+                " But hey, what do I know? I'm just an AI with opinions!",
+                " Though I reserve the right to be completely wrong about this.",
+                " Disclaimer: This is my take, and I'm not always right!"
+            ]
+            if let ending = wittyEndings.randomElement() {
+                enhanced += ending
+            }
+        }
+        
+        return enhanced
+    }
+    
     private func analyzeInput(_ input: String) -> InputAnalysis {
         return InputAnalysis(
             sentiment: analyzeSentiment(input),

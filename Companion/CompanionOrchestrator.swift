@@ -75,26 +75,23 @@ class CompanionOrchestrator: ObservableObject {
         // 3. Get current emotional state
         let emotionalState = await emotionalMemory.getCurrentEmotionalState()
         
-        // 4. Use personality engine to enhance the input
-        let personalityResponse = personalityEngine.generatePersonalityResponse(to: input)
-        
-        // 5. Decide if a tool is needed (simplified for now)
+        // 4. Decide if a tool is needed (simplified for now)
         if let toolResponse = await toolManager.decideAndExecuteTool(for: input) {
             await shortTermMemory.addMessage(toolResponse)
             await updateMemories(input: input, response: toolResponse, emotionalState: emotionalState)
             return toolResponse
         }
         
-        // 6. Generate response using the selected AI provider with personality
-        let aiResponse = await aiManager.generateResponse(to: personalityResponse)
+        // 5. Generate response using the selected AI provider
+        let aiResponse = await aiManager.generateResponse(to: input)
         
         // Update current AI provider for debugging
         currentAIProvider = aiManager.currentProvider.name
         
-        // 7. Apply personality enhancements to the AI response
-        let enhancedResponse = personalityEngine.generatePersonalityResponse(to: aiResponse)
+        // 6. Apply light personality enhancements to the AI response
+        let enhancedResponse = personalityEngine.enhanceAIResponse(aiResponse, for: input)
         
-        // 8. Update memory systems with the enhanced response
+        // 7. Update memory systems with the enhanced response
         await shortTermMemory.addMessage(enhancedResponse)
         await updateMemories(input: input, response: enhancedResponse, emotionalState: emotionalState)
         
