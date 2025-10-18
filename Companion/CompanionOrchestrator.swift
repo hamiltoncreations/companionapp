@@ -6,51 +6,7 @@ protocol Memory {
     func initialize() async
 }
 
-/// Simple memory manager
-class MemoryManager {
-    private var memories: [any Memory] = []
-    
-    func addMemory(_ memory: any Memory) {
-        memories.append(memory)
-        print("MemoryManager: Added \(memory.name)")
-    }
-    
-    func initialize() async {
-        print("MemoryManager: Initializing all memories...")
-        for memory in memories {
-            await memory.initialize()
-        }
-        print("MemoryManager: All memories initialized.")
-    }
-}
 
-/// Simple tool manager
-class ToolManager {
-    private var tools: [any Tool] = []
-    
-    func addTool(_ tool: any Tool) {
-        tools.append(tool)
-        print("ToolManager: Added \(tool.name) tool.")
-    }
-    
-    func decideAndExecuteTool(for input: String) async -> String? {
-        print("ToolManager: Deciding if a tool is needed for input: '\(input)'")
-        // Simple keyword-based decision for now
-        if input.lowercased().contains("calendar") || input.lowercased().contains("schedule") {
-            return await tools.first(where: { $0.name == "Calendar" })?.execute(input: input)
-        } else if input.lowercased().contains("weather") {
-            return await tools.first(where: { $0.name == "Weather" })?.execute(input: input)
-        } else if input.lowercased().contains("remind") {
-            return await tools.first(where: { $0.name == "Reminder" })?.execute(input: input)
-        } else if input.lowercased().contains("music") || input.lowercased().contains("play song") {
-            return await tools.first(where: { $0.name == "Music" })?.execute(input: input)
-        } else if input.lowercased().contains("photo") || input.lowercased().contains("picture") {
-            return await tools.first(where: { $0.name == "Photo" })?.execute(input: input)
-        }
-        print("ToolManager: No tool selected.")
-        return nil
-    }
-}
 
 /// Advanced companion orchestrator
 /// Manages memory, tools, and multiple AI systems
@@ -155,7 +111,9 @@ class CompanionOrchestrator: ObservableObject {
     
     private func setupTools() {
         // Calendar tool
-        toolManager.addTool(CalendarTool())
+        if #available(macOS 14.0, iOS 17.0, *) {
+            toolManager.addTool(CalendarTool())
+        }
         
         // Weather tool
         toolManager.addTool(WeatherTool())

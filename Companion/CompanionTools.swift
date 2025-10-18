@@ -10,12 +10,14 @@ protocol Tool {
 }
 
 /// Calendar tool for managing events
+@available(macOS 14.0, iOS 17.0, *)
 class CalendarTool: Tool {
     let name = "Calendar"
     let description = "Manage calendar events and appointments"
     
     private let eventStore = EKEventStore()
     
+    @available(macOS 14.0, iOS 17.0, *)
     func execute(input: String) async -> String {
         // Request calendar access
         let status = EKEventStore.authorizationStatus(for: .event)

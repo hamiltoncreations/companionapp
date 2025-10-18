@@ -35,16 +35,17 @@ let package = Package(
                 "CompanionAI.swift",
                 "Companion3DModel.swift",
                 "AIProvider.swift",
-                "LocalAIProvider.swift", 
                 "CloudAIProvider.swift",
-                "TinyLlamaAI.swift",
-                "Phi3MiniAI.swift",
                 "AIManager.swift",
                 "CompanionOrchestrator.swift",
                 "MemorySystems.swift",
                 "CompanionTools.swift",
                 "VoiceManager.swift",
-                "PersonalityEngine.swift"
+                "PersonalityEngine.swift",
+                "OpenAIProvider.swift",
+                "RuleBasedAIProvider.swift",
+                "MemoryManager.swift",
+                "ToolManager.swift"
             ]
         )
     ]

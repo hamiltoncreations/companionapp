@@ -14,7 +14,7 @@ class VoiceManager: NSObject, ObservableObject {
     
     // Voice configuration
     private var currentVoice: AVSpeechSynthesisVoice?
-    private var baseRate: Float = 0.5
+    private var baseRate: Float = 0.3
     private var basePitch: Float = 1.0
     private var baseVolume: Float = 1.0
     
@@ -129,6 +129,9 @@ class VoiceManager: NSObject, ObservableObject {
     private func processTextForPersonality(_ text: String, emotion: VoiceEmotion) -> String {
         var processedText = text
         
+        // Add natural pauses for all emotions
+        processedText = addNaturalPauses(processedText)
+        
         // Add personality-based punctuation and emphasis
         switch emotion {
         case .excited:
@@ -168,18 +171,31 @@ class VoiceManager: NSObject, ObservableObject {
         // Add witty emphasis and pauses
         return text.replacingOccurrences(of: "but", with: "but...")
             .replacingOccurrences(of: "however", with: "how-ever")
+            .replacingOccurrences(of: "well", with: "well...")
+            .replacingOccurrences(of: "actually", with: "actually...")
     }
     
     private func addThinkingMarkers(_ text: String) -> String {
         // Add thinking pauses
         return text.replacingOccurrences(of: ".", with: "...")
             .replacingOccurrences(of: ",", with: ",,,")
+            .replacingOccurrences(of: "?", with: "?..")
+            .replacingOccurrences(of: "!", with: "!..")
     }
     
     private func addAngerMarkers(_ text: String) -> String {
         // Add anger emphasis
         return text.replacingOccurrences(of: "!", with: "!!")
             .replacingOccurrences(of: "no", with: "NO")
+    }
+    
+    private func addNaturalPauses(_ text: String) -> String {
+        // Add natural pauses for better speech flow
+        return text.replacingOccurrences(of: ". ", with: "... ")
+            .replacingOccurrences(of: ", ", with: ",, ")
+            .replacingOccurrences(of: "? ", with: "?.. ")
+            .replacingOccurrences(of: "! ", with: "!.. ")
+            .replacingOccurrences(of: ": ", with: ":.. ")
     }
     
     private func addSadnessMarkers(_ text: String) -> String {
@@ -273,7 +289,7 @@ class VoiceManager: NSObject, ObservableObject {
             utterance.pitchMultiplier = basePitch
             utterance.volume = baseVolume
         case .excited:
-            utterance.rate = baseRate * 1.3
+            utterance.rate = baseRate * 1.1
             utterance.pitchMultiplier = basePitch * 1.2
             utterance.volume = baseVolume * 1.1
         case .sad:
@@ -281,7 +297,7 @@ class VoiceManager: NSObject, ObservableObject {
             utterance.pitchMultiplier = basePitch * 0.8
             utterance.volume = baseVolume * 0.9
         case .angry:
-            utterance.rate = baseRate * 1.1
+            utterance.rate = baseRate * 1.05
             utterance.pitchMultiplier = basePitch * 1.3
             utterance.volume = baseVolume * 1.2
         case .thinking:
@@ -293,7 +309,7 @@ class VoiceManager: NSObject, ObservableObject {
             utterance.pitchMultiplier = basePitch * 1.1
             utterance.volume = baseVolume * 1.0
         case .witty:
-            utterance.rate = baseRate * 1.1
+            utterance.rate = baseRate * 1.05
             utterance.pitchMultiplier = basePitch * 1.05
             utterance.volume = baseVolume * 1.0
         }

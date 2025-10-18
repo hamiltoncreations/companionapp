@@ -271,7 +271,7 @@ struct Companion3DView: NSViewRepresentable {
 
 struct SettingsView: View {
     @Environment(\.presentationMode) private var presentationMode
-    @AppStorage("speechRate") private var speechRate: Double = 0.5
+    @AppStorage("speechRate") private var speechRate: Double = 0.3
     @AppStorage("speechPitch") private var speechPitch: Double = 1.0
     @AppStorage("companionName") private var companionName: String = "Companion"
     
