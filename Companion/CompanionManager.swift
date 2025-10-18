@@ -121,7 +121,7 @@ class CompanionManager: NSObject, ObservableObject {
         
         // Scale mouth based on phoneme intensity
         let scale = SCNVector3(1.0, 0.4 + (openness * 0.6), 0.2 + (openness * 0.3))
-        companionModel.mouthNode.scale = scale
+        companionModel.mouthNode?.scale = scale
     }
     
     private func requestPermissions() {

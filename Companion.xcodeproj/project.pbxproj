@@ -19,6 +19,7 @@
 		34BD92542EA44009004FB72A /* PersonalityEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34BD92512EA44009004FB72A /* PersonalityEngine.swift */; };
 		34BD92572EA44D10004FB72A /* MemoryManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34BD92552EA44D10004FB72A /* MemoryManager.swift */; };
 		34BD92582EA44D10004FB72A /* ToolManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34BD92562EA44D10004FB72A /* ToolManager.swift */; };
+		34BD925A2EA459EF004FB72A /* maddie.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 34BD92592EA459EF004FB72A /* maddie.usdz */; };
 		A1234567890ABCDEF001 /* CompanionApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890ABCDEF002 /* CompanionApp.swift */; };
 		A1234567890ABCDEF003 /* CompanionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890ABCDEF004 /* CompanionManager.swift */; };
 		A1234567890ABCDEF005 /* Companion3DModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890ABCDEF006 /* Companion3DModel.swift */; };
@@ -39,6 +40,7 @@
 		34BD92522EA44009004FB72A /* VoiceManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceManager.swift; sourceTree = "<group>"; };
 		34BD92552EA44D10004FB72A /* MemoryManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemoryManager.swift; sourceTree = "<group>"; };
 		34BD92562EA44D10004FB72A /* ToolManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolManager.swift; sourceTree = "<group>"; };
+		34BD92592EA459EF004FB72A /* maddie.usdz */ = {isa = PBXFileReference; lastKnownFileType = file; path = maddie.usdz; sourceTree = "<group>"; };
 		A1234567890ABCDEF002 /* CompanionApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompanionApp.swift; sourceTree = "<group>"; };
 		A1234567890ABCDEF004 /* CompanionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompanionManager.swift; sourceTree = "<group>"; };
 		A1234567890ABCDEF006 /* Companion3DModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Companion3DModel.swift; sourceTree = "<group>"; };
@@ -70,6 +72,7 @@
 		A1234567890ABCDEF016 /* Companion */ = {
 			isa = PBXGroup;
 			children = (
+				34BD92592EA459EF004FB72A /* maddie.usdz */,
 				34BD92552EA44D10004FB72A /* MemoryManager.swift */,
 				34BD92562EA44D10004FB72A /* ToolManager.swift */,
 				34BD92512EA44009004FB72A /* PersonalityEngine.swift */,
@@ -159,6 +162,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				A1234567890ABCDEF011 /* Assets.xcassets in Resources */,
+				34BD925A2EA459EF004FB72A /* maddie.usdz in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
