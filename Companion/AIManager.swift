@@ -44,13 +44,15 @@ class AIManager: ObservableObject {
     /// Load the AI manager
     func load() async throws {
         print("🚀 Loading AIManager...")
+        print("📋 Available providers to try: \(availableProviders.map { $0.name })")
         
         // Try to load the first available provider
         for provider in availableProviders {
+            print("🔄 Trying to load provider: \(provider.name)")
             do {
                 try await provider.load()
                 currentProvider = provider
-                print("✅ Loaded \(provider.name)")
+                print("✅ Successfully loaded \(provider.name)")
                 return
             } catch {
                 print("⚠️ Failed to load \(provider.name): \(error)")
@@ -64,20 +66,25 @@ class AIManager: ObservableObject {
     
     /// Setup available AI providers
     private func setupProviders() {
+        print("🚀 Setting up AI providers...")
         var providers: [AIProvider] = []
         
         // Add OpenAI/ChatGPT provider (primary AI) - requires API key
         if let openAIKey = getOpenAIKey() {
+            print("✅ OpenAI API key found, adding OpenAI provider")
             providers.append(OpenAIProvider(apiKey: openAIKey))
         } else {
             print("⚠️ OpenAI API key not found. Add OPENAI_API_KEY to your environment or Info.plist")
         }
+        
+        print("✅ Adding rule-based fallback provider")
         providers.append(RuleBasedAIProvider()) // Fallback
         
         // Future cloud AI providers (require API keys)
         // AnthropicProvider(apiKey: "your-api-key")
         
         availableProviders = providers
+        print("📋 Available providers: \(providers.map { $0.name })")
     }
     
     /// Get provider by name
@@ -105,6 +112,8 @@ class AIManager: ObservableObject {
     
     /// Load API key from .env file
     private func loadFromEnvFile() -> String? {
+        print("🔍 Searching for .env file...")
+        
         // Try multiple possible locations for .env file
         let possiblePaths = [
             // Current working directory
@@ -117,23 +126,37 @@ class AIManager: ObservableObject {
             FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent(".env")
         ].compactMap { $0 }
         
+        print("🔍 Checking paths:")
+        for path in possiblePaths {
+            print("  - \(path.path)")
+        }
+        
         for envFileURL in possiblePaths {
             do {
+                print("🔍 Trying to read: \(envFileURL.path)")
                 let content = try String(contentsOf: envFileURL)
+                print("✅ Successfully read .env file at: \(envFileURL.path)")
+                print("📄 File content length: \(content.count) characters")
+                
                 let lines = content.components(separatedBy: .newlines)
                 
                 for line in lines {
                     let trimmedLine = line.trimmingCharacters(in: .whitespacesAndNewlines)
                     if trimmedLine.hasPrefix("OPENAI_API_KEY=") {
                         let key = String(trimmedLine.dropFirst("OPENAI_API_KEY=".count))
+                        print("🔑 Found API key, length: \(key.count) characters")
+                        print("🔑 Key starts with: \(String(key.prefix(10)))...")
+                        
                         if !key.isEmpty && key != "your-openai-api-key-here" {
-                            print("✅ Found API key in .env file at: \(envFileURL.path)")
+                            print("✅ Valid API key found in .env file at: \(envFileURL.path)")
                             return key
+                        } else {
+                            print("❌ API key is empty or placeholder")
                         }
                     }
                 }
             } catch {
-                // Continue to next path
+                print("❌ Failed to read .env file at \(envFileURL.path): \(error)")
                 continue
             }
         }

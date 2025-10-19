@@ -1,6 +1,7 @@
 import Foundation
 import SceneKit
 import AVFoundation
+import Combine
 #if canImport(UIKit)
 import UIKit
 #else
@@ -14,6 +15,11 @@ class Companion3DModel: SCNNode {
     private var eyebrowNodes: [SCNNode] = []
     private var particleSystem: SCNParticleSystem?
     private var thinkingParticles: SCNNode?
+    
+    // Loading state management
+    @Published var isLoading: Bool = true
+    @Published var loadingProgress: Float = 0.0
+    private var isModelLoaded: Bool = false
     
     // Animation properties
     private var isSpeaking: Bool = false
@@ -30,21 +36,13 @@ class Companion3DModel: SCNNode {
     override init() {
         super.init()
         
-        // Load USDZ model
-        loadUSDZModel()
+        // Start with lightweight fallback geometry for immediate display
+        createFallbackGeometry()
         
-        // Create fallback geometry if USDZ loading fails
-        if modelNode == nil {
-            print("⚠️ USDZ model failed to load, using fallback geometry")
-            createFallbackGeometry()
-        } else {
-            print("✅ USDZ model loaded successfully!")
+        // Load USDZ model asynchronously in background
+        Task {
+            await loadUSDZModelAsync()
         }
-        
-        // Setup animations and effects
-        setupAnimations()
-        setupParticleSystem()
-        startBreathing()
     }
     
     required init?(coder: NSCoder) {
@@ -53,54 +51,72 @@ class Companion3DModel: SCNNode {
     
     // MARK: - USDZ Model Loading
     
-    private func loadUSDZModel() {
-        // Debug: List all files in bundle
-        if let bundlePath = Bundle.main.resourcePath {
-            print("📁 Bundle contents:")
-            do {
-                let files = try FileManager.default.contentsOfDirectory(atPath: bundlePath)
-                for file in files {
-                    if file.contains("maddie") || file.contains("usdz") {
-                        print("  📄 Found: \(file)")
-                    }
-                }
-            } catch {
-                print("❌ Error listing bundle contents: \(error)")
-            }
+    private func loadUSDZModelAsync() async {
+        print("🚀 Starting async USDZ model loading...")
+        
+        // Update loading progress
+        await MainActor.run {
+            self.loadingProgress = 0.1
         }
         
+        // Check if model exists
         guard let url = Bundle.main.url(forResource: "maddie", withExtension: "usdz") else {
             print("❌ USDZ model not found in bundle")
-            print("🔍 Searching for any .usdz files...")
-            
-            // Try to find any USDZ files
-            if let bundlePath = Bundle.main.resourcePath {
-                do {
-                    let files = try FileManager.default.contentsOfDirectory(atPath: bundlePath)
-                    let usdzFiles = files.filter { $0.hasSuffix(".usdz") }
-                    print("📄 Found USDZ files: \(usdzFiles)")
-                } catch {
-                    print("❌ Error searching for USDZ files: \(error)")
-                }
+            await MainActor.run {
+                self.isLoading = false
             }
             return
         }
         
+        await MainActor.run {
+            self.loadingProgress = 0.3
+        }
+        
+        // Load model on background queue
         do {
-            let scene = try SCNScene(url: url)
-            modelNode = scene.rootNode
+            let scene = try await Task.detached {
+                try SCNScene(url: url)
+            }.value
             
-            // Add the model to our node
-            if let modelNode = modelNode {
-                addChildNode(modelNode)
+            await MainActor.run {
+                self.loadingProgress = 0.7
+            }
+            
+            // Update UI on main thread
+            await MainActor.run {
+                // Remove fallback geometry
+                self.removeAllChildNodes()
                 
-                // Try to find mouth and eye nodes in the model
-                findFacialNodes()
+                // Add the new model
+                self.modelNode = scene.rootNode
+                if let modelNode = self.modelNode {
+                    self.addChildNode(modelNode)
+                    self.findFacialNodes()
+                }
                 
-                print("✅ USDZ model loaded successfully")
+                self.isModelLoaded = true
+                self.isLoading = false
+                self.loadingProgress = 1.0
+                
+                // Setup animations now that model is loaded
+                self.setupAnimations()
+                self.setupParticleSystem()
+                self.startBreathing()
+                
+                print("✅ USDZ model loaded successfully asynchronously!")
             }
         } catch {
-            print("❌ Failed to load USDZ model: \(error)")
+            print("❌ Failed to load USDZ model asynchronously: \(error)")
+            await MainActor.run {
+                self.isLoading = false
+            }
+        }
+    }
+    
+    private func removeAllChildNodes() {
+        // Remove all existing child nodes
+        for child in childNodes {
+            child.removeFromParentNode()
         }
     }
     
@@ -128,25 +144,32 @@ class Companion3DModel: SCNNode {
     }
     
     private func createFallbackGeometry() {
-        // Create fallback geometry if USDZ loading fails
-        let headGeometry = SCNSphere(radius: 1.2)
-        let headNode = SCNNode(geometry: headGeometry)
+        // Create lightweight fallback geometry for immediate display
+        let headGeometry = SCNSphere(radius: 1.0)
+        headGeometry.firstMaterial?.diffuse.contents = PlatformColor.systemBlue.withAlphaComponent(0.9)
+        headGeometry.firstMaterial?.specular.contents = PlatformColor.white
+        headGeometry.firstMaterial?.shininess = 0.3
         
-        // Create body structure
-        let bodyGeometry = SCNSphere(radius: 0.8)
-        bodyGeometry.firstMaterial?.diffuse.contents = PlatformColor.systemBlue.withAlphaComponent(0.8)
+        let headNode = SCNNode(geometry: headGeometry)
+        headNode.name = "fallback_head"
+        
+        // Create simple body
+        let bodyGeometry = SCNSphere(radius: 0.6)
+        bodyGeometry.firstMaterial?.diffuse.contents = PlatformColor.systemPurple.withAlphaComponent(0.8)
         bodyGeometry.firstMaterial?.specular.contents = PlatformColor.white
         bodyGeometry.firstMaterial?.shininess = 0.2
         
         let bodyNode = SCNNode(geometry: bodyGeometry)
-        bodyNode.position = SCNVector3(0, -1.5, 0)
-        bodyNode.scale = SCNVector3(0.7, 1.0, 0.6)
+        bodyNode.position = SCNVector3(0, -1.2, 0)
+        bodyNode.scale = SCNVector3(0.8, 1.2, 0.6)
+        bodyNode.name = "fallback_body"
         
-        // Create mouth for fallback
-        let mouthGeometry = SCNCapsule(capRadius: 0.15, height: 0.3)
+        // Create simple mouth for fallback
+        let mouthGeometry = SCNSphere(radius: 0.1)
         mouthGeometry.firstMaterial?.diffuse.contents = PlatformColor.systemPink
         mouthNode = SCNNode(geometry: mouthGeometry)
-        mouthNode?.position = SCNVector3(0, -0.3, 0.9)
+        mouthNode?.position = SCNVector3(0, -0.2, 0.8)
+        mouthNode?.name = "fallback_mouth"
         
         // Add fallback nodes
         addChildNode(headNode)
@@ -155,7 +178,7 @@ class Companion3DModel: SCNNode {
             addChildNode(mouthNode)
         }
         
-        print("⚠️ Using fallback geometry - USDZ model not available")
+        print("✅ Created lightweight fallback geometry for instant display")
     }
     
     // MARK: - Animation Setup

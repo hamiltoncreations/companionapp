@@ -14,6 +14,8 @@ class CompanionManager: NSObject, ObservableObject {
     @Published var userInput: String = ""
     @Published var isSpeaking: Bool = false
     @Published var isListening: Bool = false
+    @Published var isModelLoading: Bool = true
+    @Published var modelLoadingProgress: Float = 0.0
     
     let scene: SCNScene
     private var companionModel: Companion3DModel?
@@ -41,42 +43,85 @@ class CompanionManager: NSObject, ObservableObject {
         
         super.init()
         
-        setupScene()
-        setupAudio()
-        requestPermissions()
+        // Setup lightweight scene first for immediate display
+        setupLightweightScene()
         
-        // Load AI orchestrator
+        // Defer heavy initialization to background
         Task {
-            do {
-                try await orchestrator.load()
-            } catch {
-                print("❌ Failed to load AI orchestrator: \(error)")
-            }
+            await initializeHeavyComponents()
         }
     }
     
-    private func setupScene() {
-        // Create enhanced 3D companion model
-        companionModel = Companion3DModel()
-        companionModel?.position = SCNVector3(0, 0, 0)
-        
-        // Add gentle floating animation
-        let floatUp = SCNAction.moveBy(x: 0, y: 0.1, z: 0, duration: 2.0)
-        let floatDown = SCNAction.moveBy(x: 0, y: -0.1, z: 0, duration: 2.0)
-        let floatSequence = SCNAction.sequence([floatUp, floatDown])
-        let repeatFloat = SCNAction.repeatForever(floatSequence)
-        companionModel?.runAction(repeatFloat)
-        
-        scene.rootNode.addChildNode(companionModel!)
-        
-        // Add enhanced lighting
+    private func setupLightweightScene() {
+        // Create basic lighting for immediate display
         let ambientLight = SCNNode()
         ambientLight.light = SCNLight()
         ambientLight.light?.type = .ambient
         ambientLight.light?.color = PlatformColor.white
-        ambientLight.light?.intensity = 300
+        ambientLight.light?.intensity = 200
         scene.rootNode.addChildNode(ambientLight)
         
+        // Add basic camera
+        let cameraNode = SCNNode()
+        cameraNode.camera = SCNCamera()
+        cameraNode.position = SCNVector3(0, 0, 4)
+        cameraNode.look(at: SCNVector3(0, 0, 0))
+        scene.rootNode.addChildNode(cameraNode)
+        
+        // Create lightweight 3D model (will be replaced by full model)
+        companionModel = Companion3DModel()
+        companionModel?.position = SCNVector3(0, 0, 0)
+        scene.rootNode.addChildNode(companionModel!)
+        
+        // Monitor loading state
+        monitorModelLoading()
+    }
+    
+    private func initializeHeavyComponents() async {
+        print("🚀 Starting heavy component initialization...")
+        
+        // Setup full scene with enhanced lighting
+        print("🎨 Setting up enhanced scene...")
+        await setupEnhancedScene()
+        
+        // Setup audio (deferred)
+        print("🔊 Setting up audio...")
+        setupAudio()
+        
+        // Request permissions
+        print("🔐 Requesting permissions...")
+        requestPermissions()
+        
+        // Load AI orchestrator in background
+        print("🤖 Loading AI orchestrator...")
+        do {
+            try await orchestrator.load()
+            print("✅ AI orchestrator loaded successfully")
+        } catch {
+            print("❌ Failed to load AI orchestrator: \(error)")
+        }
+        
+        print("✅ Heavy component initialization complete")
+    }
+    
+    private func monitorModelLoading() {
+        // Monitor the 3D model's loading state
+        Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { [weak self] timer in
+            guard let self = self, let model = self.companionModel else { return }
+            
+            DispatchQueue.main.async {
+                self.isModelLoading = model.isLoading
+                self.modelLoadingProgress = model.loadingProgress
+                
+                if !model.isLoading {
+                    timer.invalidate()
+                }
+            }
+        }
+    }
+    
+    private func setupEnhancedScene() async {
+        // Add enhanced lighting
         let directionalLight = SCNNode()
         directionalLight.light = SCNLight()
         directionalLight.light?.type = .directional
@@ -86,12 +131,17 @@ class CompanionManager: NSObject, ObservableObject {
         directionalLight.look(at: SCNVector3(0, 0, 0))
         scene.rootNode.addChildNode(directionalLight)
         
-        // Add camera with better positioning
-        let cameraNode = SCNNode()
-        cameraNode.camera = SCNCamera()
-        cameraNode.position = SCNVector3(0, 0, 4)
-        cameraNode.look(at: SCNVector3(0, 0, 0))
-        scene.rootNode.addChildNode(cameraNode)
+        // Add floating animation to companion model (non-blocking)
+        if let companionModel = companionModel {
+            let floatUp = SCNAction.moveBy(x: 0, y: 0.1, z: 0, duration: 2.0)
+            let floatDown = SCNAction.moveBy(x: 0, y: -0.1, z: 0, duration: 2.0)
+            let floatSequence = SCNAction.sequence([floatUp, floatDown])
+            let repeatFloat = SCNAction.repeatForever(floatSequence)
+            // Start animation without blocking
+            Task {
+                await companionModel.runAction(repeatFloat)
+            }
+        }
     }
     
     private func setupAudio() {
@@ -108,7 +158,7 @@ class CompanionManager: NSObject, ObservableObject {
     }
     
     private func updateLipSync() {
-        guard let companionModel = companionModel else { return }
+        guard companionModel != nil else { return }
         
         if voiceManager.isSpeaking {
             let mouthOpenness = voiceManager.getMouthOpenness()
@@ -153,7 +203,7 @@ class CompanionManager: NSObject, ObservableObject {
             let response = await generateCompanionResponse(to: currentInput)
             
             // Stop thinking animation and start speaking
-            await companionModel?.stopThinking()
+            companionModel?.stopThinking()
             speak(text: response)
         }
     }
@@ -165,7 +215,7 @@ class CompanionManager: NSObject, ObservableObject {
         // Check if orchestrator is ready, if not use simple fallback
         guard orchestrator.isReady else {
             print("❌ Orchestrator not ready, using simple fallback")
-            return "Hello! I'm your AI companion. I'm still starting up, but I'm here to chat with you!"
+            return "Hey there! I'm Maddie, your gaming companion! I'm still warming up my circuits, but I'm ready to chat! What's on your mind?"
         }
         
         // Use AI orchestrator with proper AI libraries
