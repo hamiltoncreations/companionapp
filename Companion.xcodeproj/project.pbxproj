@@ -20,6 +20,7 @@
 		34BD92572EA44D10004FB72A /* MemoryManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34BD92552EA44D10004FB72A /* MemoryManager.swift */; };
 		34BD92582EA44D10004FB72A /* ToolManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34BD92562EA44D10004FB72A /* ToolManager.swift */; };
 		34BD925A2EA459EF004FB72A /* maddie.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 34BD92592EA459EF004FB72A /* maddie.usdz */; };
+		34BD925C2EA467B9004FB72A /* VoiceConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34BD925B2EA467B9004FB72A /* VoiceConfiguration.swift */; };
 		A1234567890ABCDEF001 /* CompanionApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890ABCDEF002 /* CompanionApp.swift */; };
 		A1234567890ABCDEF003 /* CompanionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890ABCDEF004 /* CompanionManager.swift */; };
 		A1234567890ABCDEF005 /* Companion3DModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890ABCDEF006 /* Companion3DModel.swift */; };
@@ -41,6 +42,7 @@
 		34BD92552EA44D10004FB72A /* MemoryManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemoryManager.swift; sourceTree = "<group>"; };
 		34BD92562EA44D10004FB72A /* ToolManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolManager.swift; sourceTree = "<group>"; };
 		34BD92592EA459EF004FB72A /* maddie.usdz */ = {isa = PBXFileReference; lastKnownFileType = file; path = maddie.usdz; sourceTree = "<group>"; };
+		34BD925B2EA467B9004FB72A /* VoiceConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceConfiguration.swift; sourceTree = "<group>"; };
 		A1234567890ABCDEF002 /* CompanionApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompanionApp.swift; sourceTree = "<group>"; };
 		A1234567890ABCDEF004 /* CompanionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompanionManager.swift; sourceTree = "<group>"; };
 		A1234567890ABCDEF006 /* Companion3DModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Companion3DModel.swift; sourceTree = "<group>"; };
@@ -72,6 +74,7 @@
 		A1234567890ABCDEF016 /* Companion */ = {
 			isa = PBXGroup;
 			children = (
+				34BD925B2EA467B9004FB72A /* VoiceConfiguration.swift */,
 				34BD92592EA459EF004FB72A /* maddie.usdz */,
 				34BD92552EA44D10004FB72A /* MemoryManager.swift */,
 				34BD92562EA44D10004FB72A /* ToolManager.swift */,
@@ -176,6 +179,7 @@
 				A1234567890ABCDEF001 /* CompanionApp.swift in Sources */,
 				A1234567890ABCDEF003 /* CompanionManager.swift in Sources */,
 				A1234567890ABCDEF005 /* Companion3DModel.swift in Sources */,
+				34BD925C2EA467B9004FB72A /* VoiceConfiguration.swift in Sources */,
 				347ED5682EA404B600CD7172 /* CompanionTools.swift in Sources */,
 				347ED56A2EA404B600CD7172 /* AIManager.swift in Sources */,
 				347ED56B2EA404B600CD7172 /* CompanionOrchestrator.swift in Sources */,

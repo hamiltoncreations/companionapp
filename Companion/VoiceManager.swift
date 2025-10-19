@@ -23,7 +23,7 @@ class VoiceManager: NSObject, ObservableObject {
     private var currentPhonemeIndex: Int = 0
     
     enum VoiceEmotion {
-        case neutral, excited, sad, angry, thinking, sarcastic, witty
+        case neutral, excited, sad, angry, thinking, sarcastic, witty, gaming, hyped, focused, salty, poggers
     }
     
     struct PhonemeTiming {
@@ -78,17 +78,39 @@ class VoiceManager: NSObject, ObservableObject {
     }
     
     private func setupVoice() {
-        // Select the best available voice
+        // Select the best available voice for young female gamer
         let voices = AVSpeechSynthesisVoice.speechVoices()
         
-        // Prefer enhanced voices for better quality
-        if let enhancedVoice = voices.first(where: { $0.quality == .enhanced }) {
-            currentVoice = enhancedVoice
-        } else if let defaultVoice = voices.first(where: { $0.language.hasPrefix("en") }) {
-            currentVoice = defaultVoice
-        } else {
-            currentVoice = AVSpeechSynthesisVoice(language: "en-US")
-        }
+        // Prioritize enhanced female voices with young characteristics
+        let preferredVoices = [
+            // Enhanced female voices (highest quality)
+            voices.first(where: { $0.quality == .enhanced && $0.name.contains("Samantha") }),
+            voices.first(where: { $0.quality == .enhanced && $0.name.contains("Karen") }),
+            voices.first(where: { $0.quality == .enhanced && $0.name.contains("Susan") }),
+            voices.first(where: { $0.quality == .enhanced && $0.name.contains("Victoria") }),
+            voices.first(where: { $0.quality == .enhanced && $0.name.contains("Kate") }),
+            
+            // Standard female voices as fallback
+            voices.first(where: { $0.name.contains("Samantha") }),
+            voices.first(where: { $0.name.contains("Karen") }),
+            voices.first(where: { $0.name.contains("Susan") }),
+            voices.first(where: { $0.name.contains("Victoria") }),
+            voices.first(where: { $0.name.contains("Kate") }),
+            
+            // Any enhanced voice
+            voices.first(where: { $0.quality == .enhanced }),
+            
+            // Any English voice
+            voices.first(where: { $0.language.hasPrefix("en") })
+        ]
+        
+        currentVoice = preferredVoices.compactMap { $0 }.first ?? AVSpeechSynthesisVoice(language: "en-US")
+        
+        // Set gamer-optimized voice parameters using configuration
+        let settings = VoiceConfiguration.gamerVoiceSettings
+        baseRate = settings.baseRate
+        basePitch = settings.basePitch
+        baseVolume = settings.baseVolume
         
         speechSynthesizer.delegate = self
     }
@@ -146,6 +168,16 @@ class VoiceManager: NSObject, ObservableObject {
             processedText = addAngerMarkers(processedText)
         case .sad:
             processedText = addSadnessMarkers(processedText)
+        case .gaming:
+            processedText = addGamingMarkers(processedText)
+        case .hyped:
+            processedText = addHypedMarkers(processedText)
+        case .focused:
+            processedText = addFocusedMarkers(processedText)
+        case .salty:
+            processedText = addSaltyMarkers(processedText)
+        case .poggers:
+            processedText = addPoggersMarkers(processedText)
         case .neutral:
             break
         }
@@ -202,6 +234,50 @@ class VoiceManager: NSObject, ObservableObject {
         // Add sadness markers
         return text.replacingOccurrences(of: ".", with: "...")
             .replacingOccurrences(of: "sorry", with: "so sorry")
+    }
+    
+    private func addGamingMarkers(_ text: String) -> String {
+        // Add gaming-specific emphasis and expressions
+        return text.replacingOccurrences(of: "epic", with: "E-PIC")
+            .replacingOccurrences(of: "awesome", with: "awe-SOME")
+            .replacingOccurrences(of: "cool", with: "cooool")
+            .replacingOccurrences(of: "nice", with: "niice")
+            .replacingOccurrences(of: "wow", with: "wooow")
+            .replacingOccurrences(of: "!", with: "! ")
+    }
+    
+    private func addHypedMarkers(_ text: String) -> String {
+        // Add hyped gaming energy
+        return text.replacingOccurrences(of: "!", with: "!!")
+            .replacingOccurrences(of: "yes", with: "YESSS")
+            .replacingOccurrences(of: "amazing", with: "a-MAZING")
+            .replacingOccurrences(of: "incredible", with: "in-CRED-ible")
+            .replacingOccurrences(of: "perfect", with: "per-FECT")
+    }
+    
+    private func addFocusedMarkers(_ text: String) -> String {
+        // Add focused gaming intensity
+        return text.replacingOccurrences(of: "okay", with: "okay...")
+            .replacingOccurrences(of: "right", with: "right...")
+            .replacingOccurrences(of: "got it", with: "got it...")
+            .replacingOccurrences(of: "sure", with: "sure...")
+    }
+    
+    private func addSaltyMarkers(_ text: String) -> String {
+        // Add salty/frustrated gaming expressions
+        return text.replacingOccurrences(of: "ugh", with: "ughhh")
+            .replacingOccurrences(of: "seriously", with: "ser-iously")
+            .replacingOccurrences(of: "come on", with: "come ON")
+            .replacingOccurrences(of: "really", with: "re-ally")
+    }
+    
+    private func addPoggersMarkers(_ text: String) -> String {
+        // Add poggers/hype expressions
+        return text.replacingOccurrences(of: "poggers", with: "POG-GERS")
+            .replacingOccurrences(of: "pog", with: "POG")
+            .replacingOccurrences(of: "clutch", with: "CLUTCH")
+            .replacingOccurrences(of: "sick", with: "SICK")
+            .replacingOccurrences(of: "!", with: "! ")
     }
     
     // MARK: - Phoneme Generation
@@ -312,6 +388,31 @@ class VoiceManager: NSObject, ObservableObject {
             utterance.rate = baseRate * 1.05
             utterance.pitchMultiplier = basePitch * 1.05
             utterance.volume = baseVolume * 1.0
+        case .gaming:
+            let settings = VoiceConfiguration.gamerVoiceSettings
+            utterance.rate = baseRate * settings.gamingRate
+            utterance.pitchMultiplier = basePitch * settings.gamingPitch
+            utterance.volume = baseVolume * settings.gamingVolume
+        case .hyped:
+            let settings = VoiceConfiguration.gamerVoiceSettings
+            utterance.rate = baseRate * settings.hypedRate
+            utterance.pitchMultiplier = basePitch * settings.hypedPitch
+            utterance.volume = baseVolume * settings.hypedVolume
+        case .focused:
+            let settings = VoiceConfiguration.gamerVoiceSettings
+            utterance.rate = baseRate * settings.focusedRate
+            utterance.pitchMultiplier = basePitch * settings.focusedPitch
+            utterance.volume = baseVolume * settings.focusedVolume
+        case .salty:
+            let settings = VoiceConfiguration.gamerVoiceSettings
+            utterance.rate = baseRate * settings.saltyRate
+            utterance.pitchMultiplier = basePitch * settings.saltyPitch
+            utterance.volume = baseVolume * settings.saltyVolume
+        case .poggers:
+            let settings = VoiceConfiguration.gamerVoiceSettings
+            utterance.rate = baseRate * settings.poggersRate
+            utterance.pitchMultiplier = basePitch * settings.poggersPitch
+            utterance.volume = baseVolume * settings.poggersVolume
         }
         
         return utterance
@@ -328,6 +429,16 @@ class VoiceManager: NSObject, ObservableObject {
             adjustEQForAnger()
         case .thinking:
             adjustEQForThinking()
+        case .gaming:
+            adjustEQForGaming()
+        case .hyped:
+            adjustEQForHyped()
+        case .focused:
+            adjustEQForFocused()
+        case .salty:
+            adjustEQForSalty()
+        case .poggers:
+            adjustEQForPoggers()
         default:
             resetEQ()
         }
@@ -364,6 +475,56 @@ class VoiceManager: NSObject, ObservableObject {
         // Reset all EQ bands to neutral
         for band in audioUnitEQ.bands {
             band.gain = 0.0
+        }
+    }
+    
+    private func adjustEQForGaming() {
+        // Use configuration for gaming EQ
+        let eqSettings = VoiceConfiguration.GamingEQSettings.gaming
+        for (index, gain) in eqSettings.enumerated() {
+            if index < audioUnitEQ.bands.count {
+                audioUnitEQ.bands[index].gain = gain
+            }
+        }
+    }
+    
+    private func adjustEQForHyped() {
+        // Use configuration for hyped EQ
+        let eqSettings = VoiceConfiguration.GamingEQSettings.hyped
+        for (index, gain) in eqSettings.enumerated() {
+            if index < audioUnitEQ.bands.count {
+                audioUnitEQ.bands[index].gain = gain
+            }
+        }
+    }
+    
+    private func adjustEQForFocused() {
+        // Use configuration for focused EQ
+        let eqSettings = VoiceConfiguration.GamingEQSettings.focused
+        for (index, gain) in eqSettings.enumerated() {
+            if index < audioUnitEQ.bands.count {
+                audioUnitEQ.bands[index].gain = gain
+            }
+        }
+    }
+    
+    private func adjustEQForSalty() {
+        // Use configuration for salty EQ
+        let eqSettings = VoiceConfiguration.GamingEQSettings.salty
+        for (index, gain) in eqSettings.enumerated() {
+            if index < audioUnitEQ.bands.count {
+                audioUnitEQ.bands[index].gain = gain
+            }
+        }
+    }
+    
+    private func adjustEQForPoggers() {
+        // Use configuration for poggers EQ
+        let eqSettings = VoiceConfiguration.GamingEQSettings.poggers
+        for (index, gain) in eqSettings.enumerated() {
+            if index < audioUnitEQ.bands.count {
+                audioUnitEQ.bands[index].gain = gain
+            }
         }
     }
     
