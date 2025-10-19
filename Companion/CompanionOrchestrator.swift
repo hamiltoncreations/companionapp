@@ -39,23 +39,33 @@ class CompanionOrchestrator: ObservableObject {
         
         setupMemorySystems()
         setupTools()
+        
+        // Make orchestrator ready immediately with fallback AI
+        isReady = true
+        currentAIProvider = aiManager.currentProvider.name
+        print("✅ CompanionOrchestrator ready with fallback AI: \(currentAIProvider)")
     }
     
     func load() async throws {
-        print("🚀 Loading CompanionOrchestrator...")
+        print("🚀 Upgrading CompanionOrchestrator with better AI...")
+        print("🔍 Current AI provider before upgrade: \(currentAIProvider)")
         
-        // Load AI manager (don't throw if it fails, just use fallback)
+        // Try to upgrade to better AI providers
         do {
+            print("🔄 Calling aiManager.load()...")
             try await aiManager.load()
+            currentAIProvider = aiManager.currentProvider.name
+            print("✅ Upgraded to better AI: \(currentAIProvider)")
         } catch {
-            print("⚠️ AI manager failed to load, using fallback: \(error)")
+            print("⚠️ AI upgrade failed, keeping fallback: \(error)")
         }
         
         // Initialize memory systems
+        print("🧠 Initializing memory systems...")
         await memoryManager.initialize()
         
-        isReady = true
-        print("✅ CompanionOrchestrator loaded successfully")
+        print("✅ CompanionOrchestrator upgrade complete")
+        print("🔍 Final AI provider: \(currentAIProvider)")
     }
     
     func generateResponse(to input: String) async -> String {

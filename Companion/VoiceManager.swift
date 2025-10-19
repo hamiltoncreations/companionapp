@@ -41,11 +41,18 @@ class VoiceManager: NSObject, ObservableObject {
         
         super.init()
         
-        setupAudioEngine()
+        // Setup basic voice first for immediate use
         setupVoice()
+        
+        // Defer heavy audio engine setup
+        Task {
+            await setupAudioEngineAsync()
+        }
     }
     
-    private func setupAudioEngine() {
+    private func setupAudioEngineAsync() async {
+        print("🚀 Setting up audio engine asynchronously...")
+        
         // Configure audio engine for enhanced voice processing
         audioEngine.attach(audioPlayerNode)
         audioEngine.attach(audioUnitEQ)
@@ -59,6 +66,7 @@ class VoiceManager: NSObject, ObservableObject {
         
         do {
             try audioEngine.start()
+            print("✅ Audio engine started successfully")
         } catch {
             print("❌ Failed to start audio engine: \(error)")
         }

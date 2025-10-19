@@ -17,22 +17,59 @@ struct CompanionApp: App {
 struct ContentView: View {
     @StateObject private var companionManager = CompanionManager()
     @State private var showingSettings = false
+    @State private var showSplash = true
     
     var body: some View {
-        NavigationView {
-            VStack(spacing: 20) {
-                // 3D Model View
-                Companion3DView(companionManager: companionManager)
-                    .frame(height: 400)
-                    .background(
-                        LinearGradient(
-                            gradient: Gradient(colors: [Color.blue.opacity(0.1), Color.purple.opacity(0.1)]),
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
+        ZStack {
+            if showSplash {
+                SplashView()
+                    .onAppear {
+                        // Hide splash after a short delay
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                            withAnimation(.easeOut(duration: 0.5)) {
+                                showSplash = false
+                            }
+                        }
+                    }
+            } else {
+                NavigationView {
+                    VStack(spacing: 20) {
+                // 3D Model View with Loading State
+                ZStack {
+                    Companion3DView(companionManager: companionManager)
+                        .frame(height: 400)
+                        .background(
+                            LinearGradient(
+                                gradient: Gradient(colors: [Color.blue.opacity(0.1), Color.purple.opacity(0.1)]),
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
                         )
-                    )
-                    .cornerRadius(20)
-                    .shadow(radius: 10)
+                        .cornerRadius(20)
+                        .shadow(radius: 10)
+                    
+                    // Loading overlay
+                    if companionManager.isModelLoading {
+                        VStack(spacing: 16) {
+                            ProgressView()
+                                .scaleEffect(1.5)
+                                .progressViewStyle(CircularProgressViewStyle(tint: .blue))
+                            
+                            Text("Loading Maddie...")
+                                .font(.headline)
+                                .foregroundColor(.primary)
+                            
+                            Text("\(Int(companionManager.modelLoadingProgress * 100))%")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                        .padding(40)
+                        .background(
+                            RoundedRectangle(cornerRadius: 20)
+                                .fill(.ultraThinMaterial)
+                        )
+                    }
+                }
                 
                 // Enhanced status indicator
                 VStack(spacing: 8) {
@@ -229,6 +266,52 @@ struct ContentView: View {
             .sheet(isPresented: $showingSettings) {
                 SettingsView()
             }
+                }
+            }
+        }
+    }
+}
+
+struct SplashView: View {
+    @State private var isAnimating = false
+    
+    var body: some View {
+        ZStack {
+            // Background gradient
+            LinearGradient(
+                gradient: Gradient(colors: [Color.blue.opacity(0.8), Color.purple.opacity(0.8)]),
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+            .ignoresSafeArea()
+            
+            VStack(spacing: 30) {
+                // App icon/logo
+                Image(systemName: "person.crop.circle.fill")
+                    .font(.system(size: 80))
+                    .foregroundColor(.white)
+                    .scaleEffect(isAnimating ? 1.1 : 1.0)
+                    .animation(.easeInOut(duration: 1.0).repeatForever(autoreverses: true), value: isAnimating)
+                
+                VStack(spacing: 10) {
+                    Text("Maddie Companion")
+                        .font(.largeTitle)
+                        .fontWeight(.bold)
+                        .foregroundColor(.white)
+                    
+                    Text("Your AI Gaming Companion")
+                        .font(.headline)
+                        .foregroundColor(.white.opacity(0.8))
+                }
+                
+                // Loading indicator
+                ProgressView()
+                    .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                    .scaleEffect(1.2)
+            }
+        }
+        .onAppear {
+            isAnimating = true
         }
     }
 }
