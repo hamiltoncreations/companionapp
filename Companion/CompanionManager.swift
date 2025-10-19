@@ -195,6 +195,20 @@ class CompanionManager: NSObject, ObservableObject {
     private func detectEmotionFromText(_ text: String) -> VoiceManager.VoiceEmotion {
         let lowercaseText = text.lowercased()
         
+        // Gaming-specific emotions (highest priority)
+        if lowercaseText.contains("poggers") || lowercaseText.contains("pog") || lowercaseText.contains("clutch") || lowercaseText.contains("sick") {
+            return .poggers
+        } else if lowercaseText.contains("epic") || lowercaseText.contains("awesome") || lowercaseText.contains("incredible") || lowercaseText.contains("perfect") {
+            return .hyped
+        } else if lowercaseText.contains("gaming") || lowercaseText.contains("game") || lowercaseText.contains("play") || lowercaseText.contains("win") {
+            return .gaming
+        } else if lowercaseText.contains("ugh") || lowercaseText.contains("seriously") || lowercaseText.contains("come on") || lowercaseText.contains("really") {
+            return .salty
+        } else if lowercaseText.contains("okay") || lowercaseText.contains("right") || lowercaseText.contains("got it") || lowercaseText.contains("sure") {
+            return .focused
+        }
+        
+        // General emotions
         if lowercaseText.contains("!") || lowercaseText.contains("amazing") || lowercaseText.contains("awesome") {
             return .excited
         } else if lowercaseText.contains("sorry") || lowercaseText.contains("sad") || lowercaseText.contains("unfortunately") {
