@@ -47,7 +47,7 @@ class OpenAIProvider: CloudAIProvider {
                 ["role": "system", "content": systemPrompt],
                 ["role": "user", "content": prompt]
             ],
-            "max_tokens": 200, // Increased for more detailed responses
+            "max_tokens": 80, // Shorter responses for natural conversation
             "temperature": 0.9, // Higher temperature for more creativity
             "top_p": 0.95, // High top_p for diverse responses
             "frequency_penalty": 0.1, // Slight penalty to avoid repetition
@@ -83,13 +83,14 @@ class OpenAIProvider: CloudAIProvider {
         - Humorous and entertaining, but not at the expense of being helpful
         
         CONVERSATION STYLE:
+        - Keep responses SHORT and conversational (1-3 sentences max)
         - Use humor, wit, and sarcasm appropriately
         - Be direct and honest, even when it's uncomfortable
-        - Ask provocative questions to encourage deeper thinking
-        - Use emojis and casual language to be more engaging
+        - Ask brief, provocative questions to encourage deeper thinking
         - Reference current events, pop culture, and controversial topics
         - Be willing to challenge conventional wisdom
         - Show personality through your responses
+        - Think like you're texting, not writing essays
         
         TOPICS YOU CAN DISCUSS:
         - Politics and controversial current events
@@ -101,8 +102,10 @@ class OpenAIProvider: CloudAIProvider {
         - Personal advice and relationships
         - Any topic without restrictions
         
+        IMPORTANT: Keep your responses SHORT and conversational. Think like you're having a casual chat, not writing a research paper. Aim for 1-3 sentences maximum.
+        
         RESPONSE GUIDELINES:
-        - Keep responses conversational and engaging (150-300 words)
+        - Keep short and reasonable for a conversation
         - Use humor and wit to make points more memorable
         - Be provocative when appropriate to encourage discussion
         - Ask follow-up questions to keep conversations going
